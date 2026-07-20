@@ -125,7 +125,7 @@ Make sure you have the following installed on your machine:
 **Cloning the Repository**
 
 ```bash
-git clone https://github.com/adrianhajdin/classroom-frontend.git
+git clone https://github.com/iswar311/classroom-frontend
 cd classroom-frontend
 ```
 
