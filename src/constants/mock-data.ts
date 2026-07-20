@@ -24,5 +24,26 @@ export const MOCK_SUBJECTS: Subject[] = [
         department: "English",
         description: "A course focused on critical reading and writing through the study of various literary genres.",
         createdAt: new Date().toISOString(),
-    }
+    },
+];
+
+export const MOCK_TEACHERS = [
+    {
+        id: 1,
+        name: "John Doe",
+        email: "john@example.com",
+        role: "teacher",
+    },
+    {
+        id: 2,
+        name: "Jane Smith",
+        email: "jane@example.com",
+        role: "teacher",
+    },
+    {
+        id: 3,
+        name: "Dr. Alan Turing",
+        email: "alan@example.com",
+        role: "teacher",
+    },
 ];

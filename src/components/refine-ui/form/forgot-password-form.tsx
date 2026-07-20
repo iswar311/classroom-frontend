@@ -14,24 +14,82 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useForgotPassword, useLink, useRefineOptions } from "@refinedev/core";
+import { useLink, useRefineOptions, useNotification } from "@refinedev/core";
+import { VerifyOTPForm } from "./verify-otp-form";
+import { ResetPasswordForm } from "./reset-password-form";
+
+type Step = "email" | "otp" | "reset";
 
 export const ForgotPasswordForm = () => {
+  const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
+  const [resetToken, setResetToken] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const Link = useLink();
-
   const { title } = useRefineOptions();
+  const { open } = useNotification();
 
-  const { mutate: forgotPassword } = useForgotPassword();
-
-  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSendOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-    forgotPassword({
-      email,
-    });
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to send OTP");
+        setIsSubmitting(false);
+        return;
+      }
+
+      open?.({
+        type: "success",
+        message: "Success",
+        description: "OTP has been sent to your email",
+      });
+
+      setStep("otp");
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setIsSubmitting(false);
+    }
   };
+
+  const handleOTPVerified = (token: string) => {
+    setResetToken(token);
+    setStep("reset");
+  };
+
+  if (step === "otp") {
+    return (
+      <VerifyOTPForm
+        email={email}
+        onOTPVerified={handleOTPVerified}
+        onBack={() => setStep("email")}
+      />
+    );
+  }
+
+  if (step === "reset") {
+    return (
+      <ResetPasswordForm
+        email={email}
+        resetToken={resetToken}
+        onBack={() => setStep("email")}
+      />
+    );
+  }
 
   return (
     <div
@@ -70,19 +128,19 @@ export const ForgotPasswordForm = () => {
           <CardDescription
             className={cn("text-muted-foreground", "font-medium")}
           >
-            Enter your email to change your password.
+            Enter your email to receive an OTP
           </CardDescription>
         </CardHeader>
 
         <CardContent className={cn("px-0")}>
-          <form onSubmit={handleForgotPassword}>
+          <form onSubmit={handleSendOTP}>
             <div className={cn("flex", "flex-col", "gap-2")}>
               <Label htmlFor="email">Email</Label>
               <div className={cn("flex", "gap-2")}>
                 <Input
                   id="email"
                   type="email"
-                  placeholder=""
+                  placeholder="your@email.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -96,11 +154,29 @@ export const ForgotPasswordForm = () => {
                     "text-white",
                     "px-6"
                   )}
+                  disabled={isSubmitting}
                 >
-                  Send
+                  {isSubmitting ? "Sending..." : "Send"}
                 </Button>
               </div>
             </div>
+
+            {error && (
+              <div
+                className={cn(
+                  "mt-4",
+                  "p-3",
+                  "bg-red-50",
+                  "border",
+                  "border-red-200",
+                  "rounded",
+                  "text-red-700",
+                  "text-sm"
+                )}
+              >
+                {error}
+              </div>
+            )}
           </form>
 
           <div className={cn("mt-8")}>

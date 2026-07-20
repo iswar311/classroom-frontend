@@ -6,8 +6,66 @@ import {Card} from "@/components/ui/card.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useGetIdentity } from "@refinedev/core";
 import { AdvancedImage } from "@cloudinary/react";
 import {bannerPhoto} from "@/lib/cloudinary.ts";
+
+type JoinDialogProps = { capacity: number; enrolled: number };
+
+function JoinDialog({ capacity, enrolled }: JoinDialogProps) {
+    const { data: identity } = useGetIdentity<{ id: string; role?: string }>();
+    const [open, setOpen] = useState(false);
+    const [code, setCode] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState(false);
+
+    const handleJoin = async () => {
+        setLoading(true);
+        setError(null);
+        setSuccess(false);
+        try {
+            if (!identity?.id) throw new Error("You must be signed in to join");
+            const res = await fetch('/api/classes/join', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, studentId: identity.id }) });
+            if (!res.ok) {
+                const body = await res.json().catch(() => null);
+                throw new Error(body?.error || body?.message || `HTTP ${res.status}`);
+            }
+            setSuccess(true);
+        } catch (err: any) {
+            setError(err?.message || 'Failed to join');
+        } finally { setLoading(false); }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button size="lg" className="w-full">Join Class</Button>
+            </DialogTrigger>
+
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Join Class</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-2">
+                    <Input placeholder="Enter invite code" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} />
+                    {error && <div className="text-sm text-red-600">{error}</div>}
+                    {success && <div className="text-sm text-green-600">Joined successfully</div>}
+                    {enrolled >= capacity && <div className="text-sm text-yellow-800">Class is at capacity ({enrolled}/{capacity}).</div>}
+                </div>
+
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={handleJoin} disabled={loading || enrolled >= capacity}>{loading ? 'Joining…' : 'Join'}</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 const Show = () => {
     const { query } = useShow<ClassDetails>({ resource: 'classes' });
@@ -112,7 +170,8 @@ const Show = () => {
                     </ol>
                 </div>
 
-                <Button size="lg" className="w-full">Join Class</Button>
+                {/* Join dialog */}
+                <JoinDialog capacity={capacity} enrolled={(classDetails as any).enrolledCount ?? 0} />
             </Card>
         </ShowView>
     )

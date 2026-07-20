@@ -1,99 +1,369 @@
-import {createDataProvider, CreateDataProviderOptions} from "@refinedev/rest";
-import {BACKEND_BASE_URL} from "@/constants";
-import {CreateResponse, GetOneResponse, ListResponse} from "@/types";
-import {HttpError} from "@refinedev/core";
+import {
+    BaseRecord,
+    DataProvider,
+    GetListParams,
+    GetListResponse,
+} from "@refinedev/core";
 
-if (!BACKEND_BASE_URL)
-    throw new Error('BACKEND_BASE_URL is not configured. Please set VITE_BACKEND_BASE_URL in your .env file.');
+const API_URL = "http://localhost:8000";
 
-const buildHttpError = async (response: Response): Promise<HttpError> => {
-    let message = 'Request failed.';
+export const dataProvider: DataProvider = {
+    getList: async <
+        TData extends BaseRecord = BaseRecord
+    >({
+        resource,
+        pagination,
+        filters,
+        sorters,
+    }: GetListParams): Promise<GetListResponse<TData>> => {
+        if (resource === "subjects") {
+            try {
+                const params = new URLSearchParams();
 
-    try {
-        const payload = (await response.json()) as { message?: string }
-
-
-        if(payload?.message) message = payload.message;
-    } catch {
-        // Ignore errors
-    }
-
-    return {
-        message,
-        statusCode: response.status
-    }
-}
-
-const options: CreateDataProviderOptions = {
-    getList: {
-        getEndpoint: ({ resource }) => resource,
-
-        buildQueryParams: async ({ resource, pagination, filters }) => {
-            const page = pagination?.currentPage ?? 1;
-            const pageSize = pagination?.pageSize ?? 10;
-
-            const params: Record<string, string|number> = { page, limit: pageSize };
-
-            filters?.forEach((filter) => {
-                const field = 'field' in filter ? filter.field : '';
-
-                const value = String(filter.value);
-
-                if(resource === 'subjects') {
-                    if(field === 'department') params.department = value;
-                    if(field === 'name' || field === 'code') params.search = value;
+                if (pagination) {
+                    params.append("page", (pagination.current || 1).toString());
+                    params.append("limit", (pagination.pageSize || 10).toString());
                 }
 
-                if(resource === 'classes') {
-                    if(field === 'name') params.search = value;
-                    if(field === 'subject') params.subject = value;
-                    if(field === 'teacher') params.teacher = value;
+                const response = await fetch(`${API_URL}/api/subjects?${params.toString()}`);
+                if (!response.ok) {
+                    const error = new Error(`HTTP error! status: ${response.status}`);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
                 }
-            })
 
-            return params;
-        },
-
-        mapResponse: async (response) => {
-            if(!response.ok) throw await buildHttpError(response);
-
-            const payload: ListResponse = await response.clone().json()
-
-            return payload.data ?? [];
-        },
-
-        getTotalCount: async (response) => {
-            if(!response.ok) throw await buildHttpError(response);
-
-            const payload: ListResponse = await response.clone().json()
-
-            return payload.pagination?.total ?? payload.data?.length ?? 0;
+                const result = await response.json();
+                return {
+                    data: result.data as TData[],
+                    total: result.pagination?.total || 0,
+                };
+            } catch (error) {
+                console.error("Failed to fetch subjects:", error);
+                return {
+                    data: [],
+                    total: 0,
+                };
+            }
         }
+
+        if (resource === "users") {
+            try {
+                const params = new URLSearchParams();
+
+                if (pagination) {
+                    params.append("page", (pagination.current || 1).toString());
+                    params.append("limit", (pagination.pageSize || 10).toString());
+                }
+
+                if (filters) {
+                    filters.forEach((filter) => {
+                        if (filter.field && filter.value !== undefined) {
+                            params.append(filter.field.toString(), filter.value.toString());
+                        }
+                    });
+                }
+
+                const response = await fetch(`${API_URL}/api/users?${params.toString()}`);
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => null);
+                    const message = errorBody?.error || `HTTP error! status: ${response.status}`;
+                    const error = new Error(message);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
+
+                const result = await response.json();
+                return {
+                    data: result.data as TData[],
+                    total: result.pagination?.total || 0,
+                };
+            } catch (error) {
+                console.error("Failed to fetch users:", error);
+                return {
+                    data: [],
+                    total: 0,
+                };
+            }
+        }
+
+        if (resource === "classes") {
+            try {
+                const params = new URLSearchParams();
+                
+                if (pagination) {
+                    params.append("page", (pagination.current || 1).toString());
+                    params.append("limit", (pagination.pageSize || 10).toString());
+                }
+
+                const response = await fetch(`${API_URL}/api/classes?${params.toString()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                
+                return {
+                    data: result.data as TData[],
+                    total: result.pagination?.total || 0,
+                };
+            } catch (error) {
+                console.error("Failed to fetch classes:", error);
+                return {
+                    data: [],
+                    total: 0,
+                };
+            }
+        }
+
+        return {
+            data: [],
+            total: 0,
+        };
     },
 
-    create: {
-        getEndpoint: ({ resource }) => resource,
-
-        buildBodyParams: async ({ variables}) => variables,
-
-        mapResponse: async (response) => {
-            const json: CreateResponse = await response.json();
-
-            return json.data ?? [];
+    getOne: async ({ id, resource }) => {
+        if (resource === "subjects") {
+            try {
+                const response = await fetch(`${API_URL}/api/subjects/${id}`);
+                if (!response.ok) {
+                    const error = new Error(`HTTP error! status: ${response.status}`);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
+                const result = await response.json();
+                return {
+                    data: result.data,
+                };
+            } catch (error) {
+                console.error("Failed to fetch subject:", error);
+                throw error;
+            }
         }
+
+        if (resource === "users") {
+            try {
+                const response = await fetch(`${API_URL}/api/users/${id}`);
+                if (!response.ok) {
+                    const error = new Error(`HTTP error! status: ${response.status}`);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
+                const result = await response.json();
+                return {
+                    data: result.data,
+                };
+            } catch (error) {
+                console.error("Failed to fetch user:", error);
+                throw error;
+            }
+        }
+
+        if (resource === "classes") {
+            try {
+                const response = await fetch(`${API_URL}/api/classes/${id}`);
+                if (!response.ok) {
+                    const error = new Error(`HTTP error! status: ${response.status}`);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
+                const result = await response.json();
+                return {
+                    data: result.data,
+                };
+            } catch (error) {
+                console.error("Failed to fetch class:", error);
+                throw error;
+            }
+        }
+
+        throw new Error("Resource not found");
     },
 
-    getOne: {
-        getEndpoint: ({ resource, id}) => `${resource}/${id}`,
+    create: async ({ resource, variables }) => {
+        if (resource === "classes") {
+            try {
+                const response = await fetch(`${API_URL}/api/classes`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(variables),
+                });
 
-        mapResponse: async (response) => {
-            const json: GetOneResponse = await response.json();
+                if (!response.ok) {
+                    const responseBody = await response.json().catch(() => null);
+                    const message =
+                        responseBody?.error ||
+                        responseBody?.message ||
+                        `HTTP error! status: ${response.status}`;
+                    const error = new Error(message);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
 
-            return json.data ?? [];
+                const result = await response.json();
+                return {
+                    data: result.data,
+                };
+            } catch (error) {
+                console.error("Failed to create class:", error);
+                throw error;
+            }
         }
-    }
-}
 
-const { dataProvider } = createDataProvider(BACKEND_BASE_URL, options);
+        if (resource === "subjects") {
+            try {
+                const response = await fetch(`${API_URL}/api/subjects`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(variables),
+                });
 
-export { dataProvider };
+                if (!response.ok) {
+                    const responseBody = await response.json().catch(() => null);
+                    const message =
+                        responseBody?.error ||
+                        responseBody?.message ||
+                        `HTTP error! status: ${response.status}`;
+                    const error = new Error(message);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
+
+                const result = await response.json();
+                return {
+                    data: result.data,
+                };
+            } catch (error) {
+                console.error("Failed to create subject:", error);
+                throw error;
+            }
+        }
+
+        if (resource === "users") {
+            try {
+                const response = await fetch(`${API_URL}/api/users`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(variables),
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => null);
+                    const message = errorBody?.error || errorBody?.message || `HTTP error! status: ${response.status}`;
+                    const error = new Error(message);
+                    (error as any).status = response.status;
+                    (error as any).statusCode = response.status;
+                    throw error;
+                }
+
+                const result = await response.json();
+                return { data: result.data };
+            } catch (error) {
+                console.error("Failed to create user:", error);
+                throw error;
+            }
+        }
+
+        return {
+            data: {
+                id: Date.now(),
+                ...variables,
+            },
+        };
+    },
+
+    update: async ({ id, variables, resource }) => {
+        if (resource === "users") {
+            const response = await fetch(`${API_URL}/api/users/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(variables),
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => null);
+                const message = err?.error || err?.message || `HTTP error! status: ${response.status}`;
+                const error = new Error(message);
+                (error as any).status = response.status;
+                throw error;
+            }
+
+            const result = await response.json();
+            return { data: result.data };
+        }
+
+        if (resource === "subjects") {
+            const response = await fetch(`${API_URL}/api/subjects/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(variables),
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => null);
+                const message = err?.error || err?.message || `HTTP error! status: ${response.status}`;
+                const error = new Error(message);
+                (error as any).status = response.status;
+                throw error;
+            }
+
+            const result = await response.json();
+            return { data: result.data };
+        }
+
+        return { data: { id, ...variables } };
+    },
+
+    deleteOne: async ({ id, resource }) => {
+        if (resource === "users") {
+            const response = await fetch(`${API_URL}/api/users/${id}`, { method: "DELETE" });
+            if (!response.ok) {
+                const err = await response.json().catch(() => null);
+                const message = err?.error || err?.message || `HTTP error! status: ${response.status}`;
+                const error = new Error(message);
+                (error as any).status = response.status;
+                throw error;
+            }
+            const result = await response.json().catch(() => ({ data: { id } }));
+            return { data: result.data || { id } };
+        }
+
+        if (resource === "subjects") {
+            const response = await fetch(`${API_URL}/api/subjects/${id}`, { method: "DELETE" });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return { data: { id } };
+        }
+
+        return { data: { id } };
+    },
+
+    deleteMany: async ({ ids, resource }) => {
+        if (!Array.isArray(ids)) return { data: [] };
+
+        if (resource === "users") {
+            await Promise.all(ids.map((id) => fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE' })));
+            return { data: ids };
+        }
+
+        if (resource === "classes") {
+            await Promise.all(ids.map((id) => fetch(`${API_URL}/api/classes/${id}`, { method: 'DELETE' })));
+            return { data: ids };
+        }
+
+        // fallback: return ids as deleted
+        return { data: ids };
+    },
+
+    getApiUrl: () => API_URL,
+};
+
+export default dataProvider;

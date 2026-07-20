@@ -31,6 +31,10 @@ const Create = () => {
 
     const form = useForm({
         resolver: zodResolver(classSchema),
+        defaultValues: {
+            status: "active",
+            capacity: 1,
+        },
         refineCoreProps: {
             resource: "classes",
             action: "create",
@@ -170,7 +174,7 @@ const Create = () => {
                                                     onValueChange={(value) =>
                                                         field.onChange(Number(value))
                                                     }
-                                                    value={field.value?.toString()}
+                                                    value={field.value !== undefined ? field.value.toString() : ""}
                                                     disabled={subjectsLoading}
                                                 >
                                                     <FormControl>
@@ -204,7 +208,7 @@ const Create = () => {
                                                 </FormLabel>
                                                 <Select
                                                     onValueChange={field.onChange}
-                                                    value={field.value}
+                                                    value={field.value ?? ""}
                                                     disabled={teachersLoading}
                                                 >
                                                     <FormControl>
@@ -265,7 +269,7 @@ const Create = () => {
                                                 </FormLabel>
                                                 <Select
                                                     onValueChange={field.onChange}
-                                                    value={field.value}
+                                                    value={field.value ?? ""}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full">
