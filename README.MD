@@ -116,36 +116,5 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to view the project.
 
-## <a name="links">🔗 Assets</a>
 
-Assets and snippets used in the project can be found in the **[video kit](https://jsmastery.com/video-kit/042ed3b7-c304-4683-b6c4-819647956595)**.
-
-<a href="https://jsmastery.com/video-kit/042ed3b7-c304-4683-b6c4-819647956595" target="_blank">
-  <img src="public/readme/readme-videokit.webp" alt="Video Kit Banner">
-</a>
-
-## <a name="more">🚀 More</a>
-
-**Advance your skills with Next.js Pro Course**
-
-Enjoyed creating this project? Dive deeper into our PRO courses for a richer learning adventure. They're packed with
-detailed explanations, cool features, and exercises to boost your skills. Give it a go!
-
-<a href="https://jsm.dev/pern-jsmpro" target="_blank">
-  <img src="public/readme/readme-jsmpro.webp" alt="Project Banner">
-</a>
-
-
-## Learn More about Refine
-
-This [Refine](https://github.com/refinedev/refine) project was generated with [create refine-app](https://github.com/refinedev/refine/tree/master/packages/create-refine-app).
-
-A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility ✨
-
-Refine's hooks and components simplifies the development process and eliminates the repetitive tasks by providing industry-standard solutions for crucial aspects of a project, including authentication, access control, routing, networking, state management, and i18n.
-
-To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)
-
-- **REST Data Provider** [Docs](https://refine.dev/docs/core/providers/data-provider/#overview)
-- **shadcn/ui** [Docs](https://refine.dev/docs/guides-concepts/general-concepts/#headless-concept)
 - **React Router** [Docs](https://refine.dev/docs/core/providers/router-provider/)
