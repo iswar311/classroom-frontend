@@ -1,35 +1,4 @@
-<div align="center">
-  <br />
-    <a href="https://youtu.be/ek7hmv5PVV8" target="_blank">
-      <img src="public/readme/readme-hero.webp" alt="Project Banner">
-    </a>
-  <br />
-
-  <div>
-<img src="https://img.shields.io/badge/-React-61DAFB?style=for-the-badge&logo=React&logoColor=black" />
-<img src="https://img.shields.io/badge/-Refine-42D7C3?style=for-the-badge&logo=Refine&logoColor=white" />
-<img src="https://img.shields.io/badge/-Tailwind-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
-<img src="https://img.shields.io/badge/-Typescript-3178C6?style=for-the-badge&logo=Typescript&logoColor=white" /> <br/>
-<img src="https://img.shields.io/badge/-Postgresql-4169E1?style=for-the-badge&logo=PostgreSQL&logoColor=white" /> 
-<img src="https://img.shields.io/badge/-NeonDB-00E599?style=for-the-badge&logo=Neon&logoColor=black" /> 
-<img src="https://img.shields.io/badge/-Drizzle-C5F74F?style=for-the-badge&logo=Drizzle&logoColor=black" /> 
-<img src="https://img.shields.io/badge/-Better--Auth-000?style=for-the-badge&logo=Auth0&logoColor=white" /> <br/>
-<img src="https://img.shields.io/badge/-Cloudinary-3448C5?style=for-the-badge&logo=Cloudinary&logoColor=white" />
-<img src="https://img.shields.io/badge/-Arcjet-34388F?style=for-the-badge&logo=Arcjet&logoColor=white" /> 
-<img src="https://img.shields.io/badge/-Site24x7-26CD66?style=for-the-badge&logo=Site24x7&logoColor=white" />
-<img src="https://img.shields.io/badge/-CodeRabbit-FC5D13?style=for-the-badge&logo=CodeRabbit&logoColor=white" /> 
-
-  </div>
-
-  <h3 align="center">(Frontend) University Dashboard Management</h3>
-
-   <div align="center">
-     Build this project step by step with our detailed tutorial on <a href="https://www.youtube.com/watch?v=XUkNR-JfHwo" target="_blank"><b>JavaScript Mastery</b></a> YouTube. Join the JSM family!
-    </div>
-</div>
-
-## 📋 <a name="table">Table of Contents</a>
-
+<div align="cente r"> <img src="public/readme/readme-hero.webp" alt="University Dashboard Management System Banner" /> # 🎓 University Dashboard Management System (Frontend) A modern **University Dashboard Management System** built using the **PERN Stack (PostgreSQL, Express.js, React, and Node.js)**. This application provides a centralized platform for managing academic activities through dedicated dashboards for **Administrators**, **Teachers**, and **Students**. The frontend is developed with **React**, **TypeScript**, and **Refine**, offering a responsive, intuitive, and scalable user experience for educational institutions. <br/> ![React](https://img.shields.io/badge/-React-61DAFB?style=for-the-badge&logo=react&logoColor=black) ![Refine](https://img.shields.io/badge/-Refine-42D7C3?style=for-the-badge) ![Tailwind CSS](https://img.shields.io/badge/-TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white) ![Neon](https://img.shields.io/badge/-NeonDB-00E599?style=for-the-badge) ![Drizzle ORM](https://img.shields.io/badge/-Drizzle-C5F74F?style=for-the-badge) ![Better Auth](https://img.shields.io/badge/-BetterAuth-000000?style=for-the-badge) ![Cloudinary](https://img.shields.io/badge/-Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white) ![Arcjet](https://img.shields.io/badge/-Arcjet-34388F?style=for-the-badge) </div>
 1. ✨ [Introduction](#introduction)
 2. ⚙️ [Tech Stack](#tech-stack)
 3. 🔋 [Features](#features)
